@@ -15,6 +15,7 @@ class LinearRegression:
         Bias (intercept) term.
     history : list of float
         History of the loss values during training.
+        
     """
 
     def __init__(self):
@@ -37,6 +38,7 @@ class LinearRegression:
             Learning rate (default is 0.01).
         num_iters : int, optional
             Number of gradient descent iterations (default is 1000).
+
         """
 
         n = X.shape[1]
@@ -58,6 +60,7 @@ class LinearRegression:
         -------
         y_pred : ndarray of shape (m,)
             Predicted values.
+
         """
         return np.dot(X, self.w) + self.b
     
@@ -79,6 +82,7 @@ class LinearRegression:
         -------
         loss : float
             Mean squared error of the model predictions.
+
         """
         m = X.shape[0]
 
@@ -109,6 +113,7 @@ class LinearRegression:
             Gradient of the loss with respect to w.
         dj_db : float
             Gradient of the loss with respect to b.
+            
         """
         m, n = X.shape
 
@@ -145,6 +150,7 @@ class LinearRegression:
         num_iters : int
             Number of iterations.
         """
+        
         for _ in range(num_iters):
 
             dj_dw, dj_db = self.compute_gradient(X, y)
