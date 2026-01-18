@@ -3,6 +3,7 @@ from mlfromzero.deep_learning.layer import Input
 from mlfromzero.deep_learning.loss_functions import Activation_Softmax_Loss_CategoricalCrossentropy, MeanSquaredError, BinaryCrossentropy, CategoricalCrossentropy
 from mlfromzero.deep_learning.activation_functions import ReLU, Linear, Sigmoid, Softmax
 import pickle
+import copy
 
 class Model:
 
