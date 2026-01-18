@@ -1,13 +1,16 @@
 import numpy as np
 
-class Sigmoid():
-    def __call__(self, x):
-        return 1 / (1 + np.exp(-x))
+class Sigmoid:
 
-    def gradient(self, x):
-        return self.__call__(x) * (1 - self.__call__(x))
+    def forward(self, inputs):
+        self.inputs = inputs
+        self.output = 1 / (1 + np.exp(-inputs))
+
+    def backward(self, dvalues):
+        self.dinputs = dvalues * (1 - self.output) * self.output
+
     
-class ReLu:
+class ReLU:
     def forward(self, inputs):
         self.inputs = inputs
         self.output = np.maximum(0, inputs)
@@ -32,3 +35,11 @@ class Softmax:
             jacobian_matrix = np.diagflat(single_output) - np.dot(single_output, single_output.T)
             self.dinputs[index] = np.dot(jacobian_matrix, single_dvalues)
 
+class Linear:
+
+    def forward(self, inputs):
+        self.inputs = inputs
+        self.output = inputs
+
+    def backward(self, dvalues):
+        self.dinputs = dvalues.copy()

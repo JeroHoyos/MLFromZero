@@ -11,7 +11,7 @@
 
 ## Examples
 
-## Neural Networks
+### Neural Networks
 ```
 python -m mlfromzero.examples.neural_network
 ```
@@ -21,7 +21,7 @@ python -m mlfromzero.examples.neural_network
 - Erik Lindernoren, *ML From Scratch*  
 
   https://github.com/eriklindernoren/ML-From-Scratch
-- Harrison Kinsley & Daniel Kukieła, *Neural Networks from Scratch*  page 271
+- Harrison Kinsley & Daniel Kukieła, *Neural Networks from Scratch*  page 472
 
   https://nnfs.io
 - LethalBrains — Machine Learning articles  
