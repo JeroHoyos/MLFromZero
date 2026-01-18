@@ -1,42 +1,67 @@
 import numpy as np
 from mlfromzero.deep_learning.activation_functions import Softmax
+
 class Loss:
 
-    def regularization_loss(self, layer):
-
+    def regularization_loss(self):
         regularization_loss = 0
 
-        if layer.weight_regularizer_l1 > 0:
-            regularization_loss += (
-                layer.weight_regularizer_l1
-                * np.sum(np.abs(layer.weights))
-            )
+        for layer in self.trainable_layers:
 
-        if layer.weight_regularizer_l2 > 0:
-            regularization_loss += (
-                layer.weight_regularizer_l2
-                * np.sum(layer.weights * layer.weights)
-            )
+            if layer.weight_regularizer_l1 > 0:
+                regularization_loss += (
+                    layer.weight_regularizer_l1 *
+                    np.sum(np.abs(layer.weights))
+                )
 
-        if layer.bias_regularizer_l1 > 0:
-            regularization_loss += (
-                layer.bias_regularizer_l1
-                * np.sum(np.abs(layer.biases))
-            )
+            if layer.weight_regularizer_l2 > 0:
+                regularization_loss += (
+                    layer.weight_regularizer_l2 *
+                    np.sum(layer.weights * layer.weights)
+                )
 
-        if layer.bias_regularizer_l2 > 0:
-            regularization_loss += (
-                layer.bias_regularizer_l2
-                * np.sum(layer.biases * layer.biases)
-            )
+            if layer.bias_regularizer_l1 > 0:
+                regularization_loss += (
+                    layer.bias_regularizer_l1 *
+                    np.sum(np.abs(layer.biases))
+                )
+
+            if layer.bias_regularizer_l2 > 0:
+                regularization_loss += (
+                    layer.bias_regularizer_l2 *
+                    np.sum(layer.biases * layer.biases)
+                )
 
         return regularization_loss
 
-    def calculate(self, output, y):
+    def remember_trainable_layers(self, trainable_layers):
+        self.trainable_layers = trainable_layers
+
+    def calculate(self, output, y, *, include_regularization=False):
         sample_losses = self.forward(output, y)
         data_loss = np.mean(sample_losses)
-        return data_loss
-    
+
+        self.accumulated_sum += np.sum(sample_losses)
+        self.accumulated_count += len(sample_losses)
+
+        if not include_regularization:
+            return data_loss
+
+        return data_loss, self.regularization_loss()
+
+    def calculate_accumulated(self, *, include_regularization=False):
+        data_loss = self.accumulated_sum / self.accumulated_count
+
+        if not include_regularization:
+            return data_loss
+
+        return data_loss, self.regularization_loss()
+
+    def new_pass(self):
+        self.accumulated_sum = 0
+        self.accumulated_count = 0
+
+
 
 class CategoricalCrossentropy(Loss):
     def forward(self, y_pred, y_true):
@@ -65,18 +90,7 @@ class CategoricalCrossentropy(Loss):
         self.dinputs = self.dinputs / samples
 
 class Activation_Softmax_Loss_CategoricalCrossentropy():
-    def __init__(self):
-        self.activation = Softmax()
-        self.loss = CategoricalCrossentropy()
 
-    def forward(self, inputs, y_true):
-
-        self.activation.forward(inputs)
-
-        self.output = self.activation.output
-
-        return self.loss.calculate(self.output, y_true)
-        
     def backward(self, dvalues, y_true):
             
         samples = len(dvalues)
@@ -91,7 +105,7 @@ class Activation_Softmax_Loss_CategoricalCrossentropy():
 
         self.dinputs = self.dinputs / samples
 
-class Loss_BinaryCrossentropy(Loss):
+class BinaryCrossentropy(Loss):
 
     def forward(self, y_pred, y_true):
         y_pred_clipped = np.clip(y_pred, 1e-7, 1 - 1e-7)
@@ -130,7 +144,7 @@ class MeanSquaredError(Loss):
         self.dinputs = -2 * (y_true - dvalues) / outputs
         self.dinputs = self.dinputs / samples
 
-class Loss_MeanAbsoluteError(Loss):
+class MeanAbsoluteError(Loss):
 
     def forward(self, y_pred, y_true):
         sample_losses = np.mean(np.abs(y_true - y_pred), axis=-1)
